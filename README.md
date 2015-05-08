@@ -3,6 +3,8 @@ Semantria-node
 
 Semantria-node is a port of SemantriaJavaScriptSDK for use with Nodejs or the browser.
 
+*This code is not production ready. The XMLHttpRequest library it runs on will silently fail if no response is received.*
+
 ### Quick Start
 
 ```
