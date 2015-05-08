@@ -5,15 +5,17 @@
     var root = this,
         previousSemantria = root.Semantria;
 
-    var hasRequire = typeof require !== 'undefined'
-
-    var XMLHttpRequest = root.XMLHttpRequest
+    var hasRequire = typeof require !== 'undefined',
+    	XMLHttpRequest = root.XMLHttpRequest,
+    	https, url;
 
     if(typeof XMLHttpRequest === 'undefined') {
         if(hasRequire) {
-            XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+        	XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+            https = require("https");
+            url = require("url");
         }
-        else throw new Error('Semantria requires XMLHttpRequest');
+        else throw new Error('Semantria requires https');
     }
 
 	/**
@@ -438,28 +440,67 @@
 			return headers;
 		},
 
-		runRequest: function(method, url, headers, postData) {
-			var xmlHttp;
+		runRequest: function(method, reqURL, headers, postData) {
+			// if (!https) {
+				var xmlHttp;
 
-			xmlHttp = new XMLHttpRequest();
+				xmlHttp = new XMLHttpRequest();
 
-			if(!("withCredentials" in xmlHttp) && typeof XDomainRequest !== 'undefined') {
-				xmlHttp = new XDomainRequest();
-			}
+				if(!("withCredentials" in xmlHttp) && typeof XDomainRequest !== 'undefined') {
+					xmlHttp = new XDomainRequest();
+				}
 
-			xmlHttp.open(method, url, false);
+				xmlHttp.open(method, reqURL, false);
 
-			for (var key in headers) {
-				xmlHttp.setRequestHeader(key, headers[key]);
-			}
+				for (var key in headers) {
+					xmlHttp.setRequestHeader(key, headers[key]);
+				}
 
-			xmlHttp.send(postData);
+				xmlHttp.send(postData);
 
-			return {
-				status: xmlHttp.status,
-				reason: xmlHttp.statusText,
-				data: xmlHttp.responseText
-			}
+				return {
+					status: xmlHttp.status,
+					reason: xmlHttp.statusText,
+					data: xmlHttp.responseText
+				}
+			// } else {
+			// 	reqURL = url.parse(reqURL);
+
+			// 	var responseData;
+
+			// 	var options = {
+			// 			method: method,
+			// 			host: reqURL.host,
+			// 			path: reqURL.path,
+			// 			header: headers
+			// 		}
+
+			// 		console.log(options);
+
+			// 	var req = https.request(options, function(response) {
+			// 			var data = '';
+
+			// 			response.on('data', function (chunk) {
+			// 				data += chunk;
+			// 			});
+			// 			response.on('end', function () {
+			// 				console.log(data);
+			// 				responseData = data;
+			// 			});
+			// 		})
+			// 	// .on('error', function (e) {
+			// 	// 	throw e;
+			// 	// })
+			// 	// .end(postData);
+
+			// 	while (!responseData) {
+			// 		process.nextTick();
+			// 	}
+
+			// 	return {
+			// 		status: responseData.status
+			// 	}
+			// }
 		},
 
 		authWebRequest: function(method, url, postData) {

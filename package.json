@@ -27,5 +27,9 @@
   "bugs": {
     "url": "https://github.com/gbrassey/semantria-node/issues"
   },
-  "homepage": "https://github.com/gbrassey/semantria-node"
+  "homepage": "https://github.com/gbrassey/semantria-node",
+  "devDependencies": {
+    "chai": "^2.3.0",
+    "mocha": "^2.2.4"
+  }
 }
