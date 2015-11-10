@@ -2,19 +2,65 @@
 
 ;(function() {
 
+    var _getXmlRequestObject = function () {
+        var xml = null;
+        // first, try the W3-standard object
+        if (typeof window === "object"
+            && window
+            && typeof window.XMLHttpRequest !== "undefined"
+        ) {
+            xml = new window.XMLHttpRequest();
+            // then, try Titanium framework object
+        } else if (typeof Ti === "object"
+            && Ti
+            && typeof Ti.Network.createHTTPClient !== "undefined"
+        ) {
+            xml = Ti.Network.createHTTPClient();
+            // are we in an old Internet Explorer?
+        } else if (typeof ActiveXObject !== "undefined"
+        ) {
+            try {
+                xml = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (e) {
+                console.error("ActiveXObject object not defined.");
+            }
+            // now, consider RequireJS and/or Node.js objects
+        } else if (typeof require === "function"
+            && require
+        ) {
+            console.error("xhr2 object not defined, cancelling.");
+            // look for xmlhttprequest module
+            //try {
+            //    var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+            //    xml = new XMLHttpRequest();
+            //} catch (e1) {
+            //    // or maybe the user is using xhr2
+            //    try {
+            //        var XMLHttpRequest = require("xhr2");
+            //        xml = new XMLHttpRequest();
+            //    } catch (e2) {
+            //        console.error("xhr2 object not defined, cancelling.");
+            //    }
+            //}
+        }
+        return xml;
+    };
+
     var root = this,
         previousSemantria = root.Semantria;
 
-    var hasRequire = typeof require !== 'undefined'
+    var hasRequire = typeof require !== 'undefined';
 
-    var XMLHttpRequest = root.XMLHttpRequest
-
-    if(typeof XMLHttpRequest === 'undefined') {
-        if(hasRequire) {
-            XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-        }
-        else throw new Error('Semantria requires XMLHttpRequest');
-    }
+    //var XMLHttpRequest = root.XMLHttpRequest
+    //
+    //if(typeof XMLHttpRequest === 'undefined') {
+    //    XMLHttpRequest = _getXmlRequestObject();
+    //    if(hasRequire) {
+    //        XMLHttpRequest = _getXmlRequestObject();//require("xmlhttprequest").XMLHttpRequest;
+    //        console.log(XMLHttpRequest);
+    //    }
+    //    else throw new Error('Semantria requires XMLHttpRequest');
+    //}
 
 	/**
 	 * @var {Function} emptyFn
@@ -441,7 +487,7 @@
 		runRequest: function(method, url, headers, postData) {
 			var xmlHttp;
 
-			xmlHttp = new XMLHttpRequest();
+			xmlHttp = _getXmlRequestObject();
 
 			if(!("withCredentials" in xmlHttp) && typeof XDomainRequest !== 'undefined') {
 				xmlHttp = new XDomainRequest();
